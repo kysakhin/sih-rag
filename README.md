@@ -21,21 +21,22 @@ The RAG (Retrieval-Augmented Generation) Application provides a streamlined inte
 
 ### Installation
 
-1. Clone the repository:
+#### 1.Clone the repository:
 
    ```bash
    git clone https://github.com/Harshh1705/rag_application.git
-2. Navigate to the project directory:
+```
+##### 2. Navigate to the project directory:
 
    ```bash
    cd rag_application
-  
-3.Install the required Python libraries:
+  ```
+#### 3.Install the required Python libraries:
 ```bash
 pip install -r requirements.txt
 ```
-##USEAGE:
-To run the streamlit app :
+## Useage:
+#### To run the streamlit app enter this into the terminal:
 ```bash
   streamlit run interface.py
 ```
