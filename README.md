@@ -2,14 +2,14 @@
 
 ## what this application does :
 
-The RAG (Retrieval-Augmented Generation) Application provides a streamlined interface for querying text or PDF files using retrieval-augmented generation techniques. It integrates a generative model with a retrieval mechanism to deliver contextually relevant answers based on the content of the uploaded files.
+The RAG Application uses the Google FLAN-T5 model accesed using HuggingFace, LangChain is used for retrieval framework to provide answers from text and PDF files. Streamlit is used for the interface, it retrieves and generates required information from uploaded documents. You can check the GitHub repository below
 
 ## Functions :
 
 - **File Support**: Handles `.txt` and `.pdf` file formats.
-- **Generative Model**: Utilizes the Google FLAN-T5 model from Hugging Face.
-- **Retrieval-Augmented Generation**: Combines retrieval and generative techniques to enhance answer accuracy.
-- **Streamlit Interface**: User-friendly web interface for file uploads and querying.
+- **Generative Model**: uses the Google FLAN-T5 model from Hugging Face.
+- **Retrieval-Augmented Generation**: uses RAG to get an answer
+- **Streamlit Interface**: User-friendly interface for file uploads and querying.
 
 
 
