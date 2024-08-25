@@ -86,6 +86,7 @@ def get_vectordb(file: str, faiss_index_path: str = None):
     except Exception as e:
         print(f"An error occurred in get_vectordb: {e}")
         return None
+
 ####################################################
 
 #now we create the main function that basically runs the llms
