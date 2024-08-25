@@ -42,7 +42,9 @@ def get_vectordb(file:str):
     #db.save(faiss_index_path)
     return db
     
-"""def get_vectordb(file: str, faiss_index_path: str = None):
+"""
+######################################dont use this if using you are using the app locally ############################
+def get_vectordb(file: str, faiss_index_path: str = None):
     try:
         # Check if the file exists
         if not os.path.exists(file):
@@ -86,6 +88,7 @@ def get_vectordb(file:str):
     except Exception as e:
         print(f"An error occurred in get_vectordb: {e}")
         return None
+        ######################################dont use this if using you are using the app locally ############################
 """
 ####################################################
 
