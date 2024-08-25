@@ -14,7 +14,7 @@ from langchain_community.document_loaders import TextLoader
 #depending on the file extension we will use the required loader
 #the file is then split into chunks using textsplitter
 # a vector db is then made using FAISS
-def get_vectordb(file:str):
+"""def get_vectordb(file:str):
     filename, file_extension = os.path.splitext(file) 
     embeddings = HuggingFaceEmbeddings()
 
@@ -41,6 +41,47 @@ def get_vectordb(file:str):
     db = FAISS.from_documents(docs,embeddings)
     #db.save(faiss_index_path)
     return db
+    """
+def get_vectordb(file: str):
+    try:
+        # Check if the file exists
+        if not os.path.exists(file):
+            print(f"File {file} does not exist.")
+            return None
+
+        filename, file_extension = os.path.splitext(file)
+        embeddings = HuggingFaceEmbeddings()
+
+        if file_extension == ".pdf":
+            loader = PyPDFLoader(file_path=file)
+        elif file_extension == ".txt":
+            loader = TextLoader(file_path=file)
+        else:
+            print("File extension not supported")
+            return None
+
+        try:
+            print(f"Loading document: {file}")
+            documents = loader.load()
+            print("Document loaded successfully")
+        except Exception as e:
+            print(f"Error loading document: {e}")
+            return None
+
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=700,
+            chunk_overlap=0
+        )
+
+        docs = text_splitter.split_documents(documents)
+
+        db = FAISS.from_documents(docs, embeddings)
+        # db.save(faiss_index_path)
+        return db
+
+    except Exception as e:
+        print(f"An error occurred in get_vectordb: {e}")
+        return None
 ####################################################
 
 #now we create the main function that basically runs the llms
