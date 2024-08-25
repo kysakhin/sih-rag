@@ -42,7 +42,7 @@ from langchain_community.document_loaders import TextLoader
     #db.save(faiss_index_path)
     return db
     """
-def get_vectordb(file: str):
+def get_vectordb(file: str, faiss_index_path: str = None):
     try:
         # Check if the file exists
         if not os.path.exists(file):
@@ -57,7 +57,7 @@ def get_vectordb(file: str):
         elif file_extension == ".txt":
             loader = TextLoader(file_path=file)
         else:
-            print("File extension not supported")
+            print(f"File extension {file_extension} not supported")
             return None
 
         try:
@@ -76,7 +76,11 @@ def get_vectordb(file: str):
         docs = text_splitter.split_documents(documents)
 
         db = FAISS.from_documents(docs, embeddings)
-        # db.save(faiss_index_path)
+
+        if faiss_index_path:
+            db.save(faiss_index_path)
+            print(f"FAISS index saved to {faiss_index_path}")
+
         return db
 
     except Exception as e:
