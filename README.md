@@ -1,25 +1,25 @@
 # RAG Application
 
-## Overview
+## what this application does :
 
 The RAG (Retrieval-Augmented Generation) Application provides a streamlined interface for querying text or PDF files using retrieval-augmented generation techniques. It integrates a generative model with a retrieval mechanism to deliver contextually relevant answers based on the content of the uploaded files.
 
-## Features
+## Functions :
 
 - **File Support**: Handles `.txt` and `.pdf` file formats.
 - **Generative Model**: Utilizes the Google FLAN-T5 model from Hugging Face.
 - **Retrieval-Augmented Generation**: Combines retrieval and generative techniques to enhance answer accuracy.
 - **Streamlit Interface**: User-friendly web interface for file uploads and querying.
 
-## Getting Started
 
-### Prerequisites
+
+### dependencies and what you'll need
 
 - Python 3.8+
 - Required Python libraries (listed in `requirements.txt`)
 - Hugging Face API key
 
-### Installation
+### how to install 
 
 #### 1.Clone the repository:
 
