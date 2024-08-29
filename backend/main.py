@@ -4,10 +4,16 @@ from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_chroma import Chroma
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.document_loaders import TextLoader
+from langchain_community.document_loaders.csv_loader import CSVLoader 
+from numpy import put
+import pandas as pd
+from transformers import pipeline
 
+global_csv = ""
 
 #first we create a function that takes the file input and creates a vector db 
 #this function will be later called in interface file 
@@ -24,6 +30,11 @@ def get_vectordb(file:str):
         loader = PyPDFLoader(file_path = file)
     elif file_extension == ".txt":
         loader = TextLoader(file_path = file)
+    elif file_extension == ".csv":
+        loader = CSVLoader(file_path=file)
+        global global_csv
+        global_csv = file
+        return
     else:
         print("file extension not supported")
         return None
@@ -31,14 +42,14 @@ def get_vectordb(file:str):
     documents = loader.load()
 
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size = 700,
-        chunk_overlap = 0
+        chunk_size = 400,
+        chunk_overlap = 300
     )
 
     docs = text_splitter.split_documents(documents)
 
-
     db = FAISS.from_documents(docs,embeddings)
+    # db = Chroma.from_documents(docs,embeddings)
     #db.save(faiss_index_path)
     return db
     
@@ -101,7 +112,7 @@ def get_vectordb(file: str, faiss_index_path: str = None):
 def run_llm(key,db,query:str)-> str:
     llm = HuggingFaceHub(
         repo_id = "google/flan-t5-base",
-        model_kwargs = {"temperature" : 0.8, "max_length": 512}
+        model_kwargs = {"temperature" : 0.8, "max_length": 1024}
 
     )
 
@@ -111,11 +122,10 @@ def run_llm(key,db,query:str)-> str:
     1.strictly answer the question based on the given document only, no external questions must be answered
     2. if an external question is asked which is not related to given document reply with "Information not in given document"
     3. if any general knowledge question is asked to you, like the name of an animal or a country reply with "Information not in given document" 
-    4. If you don't know the answer, don't try to make up an answer. Just say "I can't find the final answer but you may want to check the following links".
-    5. If you find the answer, write the answer with five sentences maximum.
-    6. Make sure that the answer you are giving is related to the document
-    7. double check the information provided to you and answer accordingly 
-    
+    4. Make sure that the answer you are giving is related to the document
+    5. double check the information provided to you and answer accordingly 
+    6. if numerical value is relevant to the question, extract it and include accurately in your answer.
+    7. there are multiple properties in the file. each property is only 1 word long. if it is numerical or alphanumeric value, then extract it.
 
     {context}
 
@@ -138,3 +148,19 @@ def run_llm(key,db,query:str)-> str:
 
     answer =   retrival.invoke({"query":query})
     return answer
+
+# def modify_global(path):
+#     global global_csv
+#     global_csv = path
+#
+# def get_path(path):
+#     global global_csv
+#     global_csv = path
+
+def read_csv(path,query):
+    df = pd.read_csv(path)
+    table_data = df.astype(str).to_dict(orient="records")
+    pipe = pipeline("table-question-answering", model="google/tapas-large-finetuned-wtq")
+    query.strip()
+    ans = pipe(table=table_data, query=query)
+    return ans

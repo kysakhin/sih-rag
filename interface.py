@@ -1,5 +1,6 @@
+from pandas.core.dtypes.cast import checknull
 import streamlit as st
-from backend.main import get_vectordb, run_llm
+from backend.main import get_vectordb, read_csv, run_llm, read_csv
 
 st.title("APPLICATION TO QUERY YOUR FILES ")
 st.subheader(" Works on a .txt file or a .pdf file using R.A.G")
@@ -11,7 +12,7 @@ API_key = st.sidebar.text_input("PLEASE ENTER YOUR HUGGINGFACEHUB API KEY ", typ
 
 
 #taking the file input
-uploaded_file = st.file_uploader("upload file", type=("txt","pdf"))
+uploaded_file = st.file_uploader("upload file", type=("txt","pdf","csv"))
 question = st.text_input(
 
     "Ask something about the file",
@@ -19,30 +20,47 @@ question = st.text_input(
     disabled=not uploaded_file or not API_key,
 )
 
-if API_key and uploaded_file:
-    with open(uploaded_file.name, "wb") as f:
-        f.write(uploaded_file.getbuffer())
-else:
-   st.info("no doc uploaded or no key uploaded")
+def filter(question):
+    words = question.split()
+    st.html(f"<script> console.log({words}) </script>")
+    for word in words:
+        if word == "mean" or word == "meaning":
+            return True
+    return False
+
+# if API_key and uploaded_file:
+#     with open(uploaded_file.name, "wb") as f:
+#         f.write(uploaded_file.getbuffer())
+# else:
+#    st.info("no doc uploaded or no key uploaded")
+
+inform = "./data.txt"
 
 if uploaded_file is not None:
-    vectordb = get_vectordb(uploaded_file.name)
+    vectordb = get_vectordb(inform)
+    csvpath = uploaded_file.name
     if uploaded_file is None:
         st.error("either file is not uploaded or the file type is not supported ")
-    elif vectordb is None:
-        st.error("the file type is not supported ")
+    # elif vectordb is None:
+    #     st.error("the file type is not supported ")
 else:
      st.error("Either the file is not uploaded or the file type is not supported.")
 
 #doing the spin thingy while generating a resp
 with st.spinner("Generating response..."):
     if API_key and question:
-        answer = run_llm(key= API_key, db= vectordb , query= question)
-        st.write("### Answer")
-        st.write(f"{answer['result']}")
-        st.write("### Relevant source")
-        rel_docs = answer['source_documents']
-        for i, doc in enumerate(rel_docs):
-            st.write(f"**{i+1}**: {doc.page_content}\n")
+        if filter(question):
+            answer = run_llm(key= API_key, db= vectordb , query= question)
+            st.write("### Answer")
+            st.write(f"{answer['result']}")
+            st.write("### Relevant source")
+            rel_docs = answer['source_documents']
+            for i, doc in enumerate(rel_docs):
+                st.write(f"**{i+1}**: {doc.page_content}\n")
+        else:
+            answer = read_csv(path=csvpath, query=question)
+            st.write("### Answer")
+            st.write(f"{answer['answer']}")
+
     else:
         st.info("_______________________")
