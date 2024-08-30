@@ -1,4 +1,3 @@
-from pandas.core.dtypes.cast import checknull
 import streamlit as st
 from backend.main import get_vectordb, read_csv, run_llm, read_csv
 
@@ -20,9 +19,13 @@ question = st.text_input(
     disabled=not uploaded_file or not API_key,
 )
 
+# filter the query according to words
 def filter(question):
+    # to replace special characters with empty character to make splitting better.
+    chars = ",./;'?[]<>\""
+    for char in chars:
+        question = question.replace(char, "")
     words = question.split()
-    st.html(f"<script> console.log({words}) </script>")
     for word in words:
         if word == "mean" or word == "meaning":
             return True
@@ -34,8 +37,10 @@ def filter(question):
 # else:
 #    st.info("no doc uploaded or no key uploaded")
 
+# information document. 
 inform = "./data.txt"
 
+# this needs some more work.
 if uploaded_file is not None:
     vectordb = get_vectordb(inform)
     csvpath = uploaded_file.name
@@ -46,7 +51,7 @@ if uploaded_file is not None:
 else:
      st.error("Either the file is not uploaded or the file type is not supported.")
 
-#doing the spin thingy while generating a resp
+#doing the spin thingy while generating a response
 with st.spinner("Generating response..."):
     if API_key and question:
         if filter(question):

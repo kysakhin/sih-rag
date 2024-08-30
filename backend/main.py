@@ -41,8 +41,8 @@ def get_vectordb(file:str):
     documents = loader.load()
 
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size = 400,
-        chunk_overlap = 300
+        chunk_size = 300,
+        chunk_overlap = 0
     )
 
     docs = text_splitter.split_documents(documents)
@@ -159,7 +159,7 @@ def run_llm(key,db,query:str)-> str:
 def read_csv(path,query):
     df = pd.read_csv(path)
     table_data = df.astype(str).to_dict(orient="records")
-    pipe = pipeline("table-question-answering", model="google/tapas-large-finetuned-wtq")
+    pipe = pipeline("table-question-answering", model="google/tapas-medium-finetuned-wtq")
     query.strip()
     ans = pipe(table=table_data, query=query)
     return ans
